@@ -5,6 +5,13 @@
 
 ---
 
+## 📚 Complete Documentation & Guides
+- 📖 **[Full Feature Guide & Reference](docs/FULL_DOCUMENTATION.md)** — Exhaustive guide covering all 17 core modules and primitives with in-depth code examples.
+- 🚀 **[Getting Started Guide](docs/GETTING_STARTED.md)** — 5-minute quickstart from scaffolding to production.
+- 📣 **[Worldwide Launch Kit](docs/LAUNCH_KIT.md)** — Ready-to-use launch templates for Hacker News, Reddit, Twitter/X, and Product Hunt.
+
+---
+
 ## ⚡ Why FireAPI? (Comparison Matrix)
 
 | Feature | NestJS | Express | Hono / Elysia | **FireAPI** |
