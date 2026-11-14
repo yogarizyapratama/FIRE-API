@@ -81,7 +81,7 @@ if (cmd === 'info') {
 🔥 FireAPI Framework v1.0.0
 ⚡ Engine: Bun / Node.js 20+ Native Web Standards
 🛡️ Security Shield: Enabled by default
-🗄️ Database Hub: SQLite, Postgres, MySQL, Mongo, In-Memory
+🗄️ Database Hub: SQLite & In-Memory
 🤖 AI/MCP: Native Model Context Protocol Support
 ⚡ JIT Fast-Path & Gzip Compression: Enabled
 🔒 RBAC & Policy Gates: Enabled

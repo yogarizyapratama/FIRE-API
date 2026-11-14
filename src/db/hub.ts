@@ -167,9 +167,9 @@ function createTableModel(
     insert: (data: any) => {
       if (tenantId) {
         if (Array.isArray(data)) {
-          data = data.map((d) => ({ tenantId, ...d }));
+          data = data.map((d) => ({ ...d, tenantId }));
         } else if (typeof data === 'object' && data !== null) {
-          data = { tenantId, ...data };
+          data = { ...data, tenantId };
         }
       }
       return getQb().insert(data);
@@ -244,8 +244,9 @@ export function createDatabaseHub(options: FireDatabaseOptions = {}): FireDataba
       break;
     case 'postgres':
     case 'mysql':
-      rawDb = new MemoryDatabase();
-      break;
+      throw new Error(
+        `FireDB driver "${driver}" is not implemented yet. Use "sqlite" or "memory".`
+      );
     case 'memory':
     default:
       rawDb = new MemoryDatabase();

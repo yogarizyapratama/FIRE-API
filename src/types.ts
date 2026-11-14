@@ -202,6 +202,7 @@ export interface FireSecurityOptions {
   };
   prototypePollutionGuard?: boolean;
   maxBodySize?: number; // In bytes (default 1MB)
+  trustProxy?: boolean; // Only then trust x-forwarded-for for rate limiting
 }
 
 export interface FireDatabaseOptions {
@@ -236,6 +237,6 @@ export interface FireAppOptions {
   openapiPath?: string | false; // default '/openapi.json'
   metricsPath?: string | false; // default '/metrics'
   health?: boolean | FireHealthOptions;
-  multiTenant?: { header?: string; query?: string; autoScopeDB?: boolean };
+  multiTenant?: { header?: string; query?: string; autoScopeDB?: boolean; require?: boolean };
   prefix?: string;
 }

@@ -323,7 +323,7 @@ export class FireApp {
    * The pure Web Standard fetch handler: (request: Request) => Promise<Response>
    * Runs natively on Bun, Node.js (via adapter), Cloudflare Workers, and Deno!
    */
-  public async handle(request: Request): Promise<Response> {
+  public async handle(request: Request, clientIp?: string): Promise<Response> {
     const startTime = performance.now();
     const url = new URL(request.url);
 
@@ -331,15 +331,20 @@ export class FireApp {
     if (this.options.security?.cors !== false) {
       const corsConfig = typeof this.options.security?.cors === 'object' ? this.options.security.cors : {};
       const corsPreflight = handleCORS(request, corsConfig);
-      if (corsPreflight) return corsPreflight;
+      if (corsPreflight) {
+        return this.finalizeResponse(corsPreflight, request, startTime);
+      }
     }
 
     // 2. Global Rate Limiter
     if (this.rateLimiter) {
-      const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('cf-connecting-ip') || '127.0.0.1';
-      const limitCheck = this.rateLimiter.check(clientIp);
+      const limitCheck = this.rateLimiter.check(this.resolveClientIp(request, clientIp));
       if (!limitCheck.allowed) {
-        return new HttpError(429, 'Too Many Requests', { retryAfter: limitCheck.retryAfter }).toResponse();
+        return this.finalizeResponse(
+          new HttpError(429, 'Too Many Requests', { retryAfter: limitCheck.retryAfter }).toResponse(),
+          request,
+          startTime
+        );
       }
     }
 
@@ -388,8 +393,9 @@ export class FireApp {
         if (contentType.includes('multipart/form-data')) {
           try {
             const formData = await request.formData();
-            parsedBody = {};
+            parsedBody = Object.create(null);
             formData.forEach((value, key) => {
+              if (key === '__proto__' || key === 'constructor' || key === 'prototype') return;
               if (typeof value === 'object' && value !== null && 'arrayBuffer' in value) {
                 const fileBlob = value as Blob & { name?: string };
                 const fileName = fileBlob.name || 'upload.bin';
@@ -478,6 +484,13 @@ export class FireApp {
         const headerName = this.options.multiTenant.header || 'x-tenant-id';
         const queryName = this.options.multiTenant.query || 'tenant';
         const tenantId = request.headers.get(headerName) || url.searchParams.get(queryName);
+        if (!tenantId && this.options.multiTenant.require !== false) {
+          return this.finalizeResponse(
+            new HttpError(400, `Missing tenant identifier. Provide "${headerName}" header or "${queryName}" query parameter.`).toResponse(),
+            request,
+            startTime
+          );
+        }
         if (tenantId) {
           tenantObj = { id: tenantId };
           if (this.options.multiTenant.autoScopeDB !== false) {
@@ -513,7 +526,9 @@ export class FireApp {
       const cacheRule = match.routeOptions.cache;
       let cacheKey = '';
       if (method === 'GET' && cacheRule) {
-        cacheKey = `route:${url.pathname}${url.search}`;
+        const tenantKey = tenantObj?.id || '';
+        const userKey = ctx.user?.id != null ? String(ctx.user.id) : '';
+        cacheKey = `route:${url.pathname}${url.search}:tenant=${tenantKey}:user=${userKey}`;
         const cached = await this.cache.get(cacheKey);
         if (cached) {
           const cachedRes = ctx.json(cached);
@@ -604,15 +619,27 @@ export class FireApp {
           await hook(err);
         } catch {}
       }
-      if (idempotencyKey) {
-        this.idempotencyManager.release(idempotencyKey);
-      }
       if (err instanceof HttpError) {
         return this.finalizeResponse(err.toResponse(), request, startTime);
       }
       const internalRes = new HttpError(500, err?.message || 'Internal Server Error').toResponse();
       return this.finalizeResponse(internalRes, request, startTime);
+    } finally {
+      if (idempotencyKey && this.idempotencyManager.isProcessing(idempotencyKey)) {
+        this.idempotencyManager.release(idempotencyKey);
+      }
     }
+  }
+
+  private resolveClientIp(request: Request, providedIp?: string): string {
+    if (providedIp) return providedIp;
+    if (this.options.security?.trustProxy) {
+      const forwarded = request.headers.get('x-forwarded-for');
+      if (forwarded) return forwarded.split(',')[0].trim();
+    }
+    const cfIp = request.headers.get('cf-connecting-ip');
+    if (cfIp) return cfIp;
+    return 'unknown';
   }
 
   private async finalizeResponse(response: Response, request: Request, startTime: number, reqId?: string): Promise<Response> {
@@ -663,9 +690,10 @@ export class FireApp {
 
     // If running in Bun
     if (typeof (globalThis as any).Bun !== 'undefined') {
-      const server = (globalThis as any).Bun.serve({
+      let server: any;
+      server = (globalThis as any).Bun.serve({
         port: listenPort,
-        fetch: (req: Request) => this.handle(req),
+        fetch: (req: Request) => this.handle(req, server?.requestIP?.(req)?.address),
       });
       callback?.();
       return server;
@@ -695,7 +723,7 @@ export class FireApp {
           duplex: 'half',
         });
 
-        const webRes = await this.handle(webReq);
+        const webRes = await this.handle(webReq, req.socket?.remoteAddress);
 
         res.statusCode = webRes.status;
         webRes.headers.forEach((value, key) => {
