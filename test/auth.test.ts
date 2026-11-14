@@ -4,14 +4,44 @@ import { signJWT, verifyJWT } from '../src/auth/jwt';
 import { createAuth, requireAuth } from '../src/auth/auth';
 import { createApp } from '../src/core/app';
 
+function toHex(buffer: ArrayBuffer | Uint8Array): string {
+  return Array.from(new Uint8Array(buffer as any))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+// Reproduces the pre-v1.0.4 "salt:hash" format (PBKDF2 100k) for migration tests
+async function legacyHash(password: string): Promise<string> {
+  const salt = new Uint8Array(16);
+  crypto.getRandomValues(salt);
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveBits']);
+  const derived = await crypto.subtle.deriveBits(
+    { name: 'PBKDF2', salt: salt as any, iterations: 100000, hash: 'SHA-256' },
+    keyMaterial,
+    256
+  );
+  return `${toHex(salt)}:${toHex(derived)}`;
+}
+
 describe('FireAPI Turnkey Auth Module (fire-api/auth)', () => {
   it('hashes and verifies passwords securely using Web Crypto', async () => {
     const rawPassword = 'SuperSecretPassword123!';
     const hash = await hashPassword(rawPassword);
 
-    expect(hash).toContain(':'); // salt:hash format
+    expect(hash).toContain('pbkdf2_sha256$'); // versioned format
     expect(await verifyPassword(rawPassword, hash)).toBe(true);
     expect(await verifyPassword('WrongPassword', hash)).toBe(false);
+  });
+
+  it('still verifies legacy 100k-iteration "salt:hash" passwords', async () => {
+    const rawPassword = 'LegacyPassword123!';
+    const oldHash = await legacyHash(rawPassword);
+
+    expect(oldHash).toContain(':');
+    expect(await verifyPassword(rawPassword, oldHash)).toBe(true);
+    expect(await verifyPassword('WrongPassword', oldHash)).toBe(false);
+    expect(await verifyPassword(rawPassword, oldHash + 'ff')).toBe(false);
   });
 
   it('signs and verifies JWT tokens with expiration', async () => {

@@ -23,60 +23,58 @@ function constantTimeEqualHex(a: string, b: string): boolean {
 
 // OWASP 2023 recommendation for PBKDF2-HMAC-SHA256
 const PBKDF2_ITERATIONS = 600000;
+// Iterations used by pre-v1.0.4 hashes (legacy "salt:hash" format)
+const LEGACY_PBKDF2_ITERATIONS = 100000;
+
+async function deriveHex(password: string, salt: Uint8Array, iterations: number): Promise<string> {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(password),
+    'PBKDF2',
+    false,
+    ['deriveBits', 'deriveKey']
+  );
+
+  const derived = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      salt: salt as any,
+      iterations,
+      hash: 'SHA-256',
+    },
+    keyMaterial,
+    256
+  );
+
+  return bufferToHex(derived);
+}
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = new Uint8Array(16);
   crypto.getRandomValues(salt);
 
-  const enc = new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw',
-    enc.encode(password),
-    'PBKDF2',
-    false,
-    ['deriveBits', 'deriveKey']
-  );
+  const derived = await deriveHex(password, salt, PBKDF2_ITERATIONS);
 
-  const derived = await crypto.subtle.deriveBits(
-    {
-      name: 'PBKDF2',
-      salt: salt as any,
-      iterations: PBKDF2_ITERATIONS,
-      hash: 'SHA-256',
-    },
-    keyMaterial,
-    256
-  );
-
-  return `${bufferToHex(salt)}:${bufferToHex(derived)}`;
+  return `pbkdf2_sha256$${PBKDF2_ITERATIONS}$${bufferToHex(salt)}$${derived}`;
 }
 
 export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
-  const parts = storedHash.split(':');
-  if (parts.length !== 2) return false;
+  // Legacy format "saltHex:hashHex" (PBKDF2 100k) — kept for migration
+  const legacyParts = storedHash.split(':');
+  if (legacyParts.length === 2) {
+    const [saltHex, expectedHex] = legacyParts;
+    const derived = await deriveHex(password, hexToBuffer(saltHex), LEGACY_PBKDF2_ITERATIONS);
+    return constantTimeEqualHex(derived, expectedHex);
+  }
 
-  const [saltHex, originalHashHex] = parts;
-  const salt = hexToBuffer(saltHex);
+  // Current format "pbkdf2_sha256$iterations$saltHex$hashHex"
+  const parts = storedHash.split('$');
+  if (parts.length !== 4 || parts[0] !== 'pbkdf2_sha256') return false;
 
-  const enc = new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw',
-    enc.encode(password),
-    'PBKDF2',
-    false,
-    ['deriveBits', 'deriveKey']
-  );
+  const iterations = Number(parts[1]);
+  if (!Number.isInteger(iterations) || iterations < 1) return false;
 
-  const derived = await crypto.subtle.deriveBits(
-    {
-      name: 'PBKDF2',
-      salt: salt as any,
-      iterations: PBKDF2_ITERATIONS,
-      hash: 'SHA-256',
-    },
-    keyMaterial,
-    256
-  );
-
-  return constantTimeEqualHex(bufferToHex(derived), originalHashHex);
+  const derived = await deriveHex(password, hexToBuffer(parts[2]), iterations);
+  return constantTimeEqualHex(derived, parts[3]);
 }
