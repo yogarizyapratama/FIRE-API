@@ -23,7 +23,7 @@ You can test a live production FireAPI instance running on the public internet r
 Scaffold a clean, production-ready FireAPI project in 1 second:
 
 ```bash
-npx fire-api create my-store-api
+npx @tamayrp14/fire-api create my-store-api
 cd my-store-api
 bun dev
 ```
@@ -37,11 +37,11 @@ Your API is instantly running at `http://localhost:3000` with hot-reload, intera
 Add FireAPI to any existing Node.js 20+, Bun, or Deno project:
 
 ```bash
-bun add fire-api
+bun add @tamayrp14/fire-api
 # or
-pnpm add fire-api
+pnpm add @tamayrp14/fire-api
 # or
-npm install fire-api
+npm install @tamayrp14/fire-api
 ```
 
 ---
@@ -51,7 +51,7 @@ npm install fire-api
 Create `src/index.ts`:
 
 ```typescript
-import { createApp, createRouter, s, createAuth, enableStudio } from 'fire-api';
+import { createApp, createRouter, s, createAuth, enableStudio } from '@tamayrp14/fire-api';
 
 // 1. Initialize Application with Batteries Included
 const app = createApp({
@@ -123,19 +123,19 @@ app.listen(3000, () => {
 
 ```bash
 # View visual terminal route table
-npx fire-api routes
+npx @tamayrp14/fire-api routes
 
 # Generate new CRUD resource module (route + schema)
-npx fire-api g resource comment
+npx @tamayrp14/fire-api g resource comment
 
 # Run concurrent load benchmark
-npx fire-api bench http://localhost:3000/articles
+npx @tamayrp14/fire-api bench http://localhost:3000/articles
 
 # Compile to a single standalone binary executable (<45MB)
-npx fire-api compile ./dist/api-server
+npx @tamayrp14/fire-api compile ./dist/api-server
 
 # Synthesize production distroless Dockerfile (<25MB)
-npx fire-api docker
+npx @tamayrp14/fire-api docker
 ```
 
 ---

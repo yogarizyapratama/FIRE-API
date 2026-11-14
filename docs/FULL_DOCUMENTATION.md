@@ -79,7 +79,7 @@ const app = createApp({
   
   // Universal Database
   database: {
-    driver: 'sqlite', // 'sqlite' | 'postgres' | 'memory'
+    driver: 'sqlite', // 'sqlite' | 'memory'
     url: './production.db',
   },
   
@@ -290,7 +290,7 @@ await ctx.db.tx(async (trx) => {
 
 ### Schema-Driven Auto-Seeding:
 ```typescript
-// Seeds 50 realistic records into SQLite/Postgres matching UserSchema
+// Seeds 50 realistic records into SQLite/In-Memory matching UserSchema
 await app.db.seed('users', UserSchema, 50);
 ```
 
@@ -586,5 +586,5 @@ const singleBook = await client.books['bk_123'].get();
 | **Interactive Docs** | ❌ 3rd party | ❌ 3rd party | ❌ Decorators needed | **✅ Yes (Scalar OpenAPI 3.1)** |
 | **Embedded Dev Studio** | ❌ None | ❌ None | ❌ None | **✅ Yes (`/studio`)** |
 | **In-Process Queues & Events** | ❌ None | ❌ None | ❌ Requires BullMQ/Redis | **✅ Yes (Built-in)** |
-| **Single Standalone Binary** | ❌ Complex | ❌ Complex | ❌ Difficult | **✅ Yes (`npx fire-api compile`)** |
+| **Single Standalone Binary** | ❌ Complex | ❌ Complex | ❌ Difficult | **✅ Yes (`npx @tamayrp14/fire-api compile`)** |
 | **Native AI / MCP Support** | ❌ None | ❌ None | ❌ None | **✅ Yes (Automatic)** |

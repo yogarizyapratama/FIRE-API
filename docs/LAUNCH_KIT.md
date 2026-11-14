@@ -31,7 +31,7 @@ We built **FireAPI** to give TypeScript developers the best of both worlds:
   - In-process background queues & typed event bus without needing Redis for simple setups
   - Built-in live Developer Studio (`/studio`), Prometheus metrics (`/metrics`), and Cloud-Native health probes (`/healthz`, `/readyz`)
   - File upload shield with magic-byte MIME validation (`ctx.files.avatar.store()`)
-  - Instant CLI scaffolding (`npx fire-api create my-api`) and route inspector table (`npx fire-api routes`)
+  - Instant CLI scaffolding (`npx @tamayrp14/fire-api create my-api`) and route inspector table (`npx @tamayrp14/fire-api routes`)
 
 **Live Interactive Demo running now on the internet:**
 - 📖 Interactive Docs: https://grade-gas-fit-leg.trycloudflare.com/docs
@@ -55,7 +55,7 @@ We’d love to hear your feedback, brutal critiques, and thoughts on what we sho
 >
 > In FireAPI, you define your schema once:
 > ```ts
-> import { createApp, createRouter, s } from 'fire-api';
+> import { createApp, createRouter, s } from '@tamayrp14/fire-api';
 >
 > const BookSchema = s.object({
 >   title: s.string().min(2),
@@ -81,7 +81,7 @@ We’d love to hear your feedback, brutal critiques, and thoughts on what we sho
 > 4. Exportable Bruno/Postman collections at `/docs/collection.json`.
 >
 > **Live Demo:** https://grade-gas-fit-leg.trycloudflare.com/docs  
-> Try it locally in 10 seconds: `npx fire-api create my-app`
+> Try it locally in 10 seconds: `npx @tamayrp14/fire-api create my-app`
 >
 > Would love your feedback on the type inference ergonomics!
 
@@ -98,7 +98,7 @@ We’d love to hear your feedback, brutal critiques, and thoughts on what we sho
 > **FireAPI** fixes this by bundling the essential backend primitives in a single zero-dependency core:
 > - Built-in Rate Limiting, CORS, Security Headers
 > - Built-in WebCrypto JWT + RBAC Auth
-> - Built-in SQLite/PostgreSQL dynamic ORM
+> - Built-in SQLite & In-Memory dynamic ORM
 > - Built-in In-memory Queue & Typed Event Bus
 > - Built-in Visual Route Inspector & Embedded Studio (`/studio`)
 >
@@ -122,7 +122,7 @@ We’d love to hear your feedback, brutal critiques, and thoughts on what we sho
 > 🛡️ Built-in Auth, ORM, Queues & OpenAPI 3.1 docs  
 > 🚫 Zero decorator hell  
 >
-> Try it in 1 command: `npx fire-api create my-api` 🧵👇
+> Try it in 1 command: `npx @tamayrp14/fire-api create my-api` 🧵👇
 
 **Tweet 2 (The Problem):**
 > Modern backend development in TypeScript is broken:
@@ -157,7 +157,7 @@ We’d love to hear your feedback, brutal critiques, and thoughts on what we sho
 > ✅ Prometheus metrics (`/metrics`)
 > ✅ Multi-tenant auto-scoping (`ctx.tenant`)
 > ✅ File upload shield with magic-byte inspection
-> ✅ Single standalone binary compiler (`npx fire-api compile`)
+> ✅ Single standalone binary compiler (`npx @tamayrp14/fire-api compile`)
 
 **Tweet 6 (Performance Benchmarks):**
 > 📊 Real numbers on Bun/Node 20:
@@ -173,7 +173,7 @@ We’d love to hear your feedback, brutal critiques, and thoughts on what we sho
 > Dev Studio: https://grade-gas-fit-leg.trycloudflare.com/studio
 >
 > Scaffold your project today:
-> `npx fire-api create my-api`
+> `npx @tamayrp14/fire-api create my-api`
 >
 > ⭐ Star on GitHub & share your feedback!
 
@@ -201,7 +201,7 @@ We’d love to hear your feedback, brutal critiques, and thoughts on what we sho
 > https://grade-gas-fit-leg.trycloudflare.com/docs
 >
 > Or scaffold your first app in 10 seconds:
-> `npx fire-api create my-app`
+> `npx @tamayrp14/fire-api create my-app`
 >
 > Looking forward to your thoughts and reviews!
 
@@ -232,5 +232,5 @@ npm publish
 ### Step 3: Run anywhere via NPX
 Once published, any developer in the world can run:
 ```bash
-npx fire-api create my-awesome-app
+npx @tamayrp14/fire-api create my-awesome-app
 ```

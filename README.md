@@ -42,11 +42,11 @@
 | **Relational ORM**    | TypeORM / Prisma ceremony | None | Drizzle / Prisma | **Zero-Config Dynamic Proxy (`ctx.db.users.include('posts')`)** |
 | **WebSockets**       | Heavy Socket.io wrapper | Manual `ws` wiring | Varies | **Native Rooms & Pub/Sub (`app.ws`)** |
 | **Queue & Cron**     | BullMQ + Redis + Worker required | Manual Redis / Agenda | None | **Zero-Redis In-Process Queue & Cron (`app.queue`, `app.cron`)** |
-| **Turnkey Auth**     | 6-10 files (Passport.js ceremony) | Manual DIY | Manual DIY | **1-Line Ready (`fire-api/auth`)** |
+| **Turnkey Auth**     | 6-10 files (Passport.js ceremony) | Manual DIY | Manual DIY | **1-Line Ready (`@tamayrp14/fire-api/auth`)** |
 | **Dev Dashboard**    | None | None | None | **Built-in FireStudio at `/studio`** |
 | **Express Compat**   | Incompatible / Heavy | Native | Manual adaptation | **Native Zero-Cost Bridge (`fromExpress`)** |
 | **CLI Generator**    | Heavy Angular-style CLI | None | None | **Instant Generator (`fire g resource`)** |
-| **Frontend RPC Client**| Manual fetch or code-gen SDK | Manual fetch | Elysia Eden (Elysia only) | **Native `fire-api/client` (Zero Codegen)** |
+| **Frontend RPC Client**| Manual fetch or code-gen SDK | Manual fetch | Elysia Eden (Elysia only) | **Native `@tamayrp14/fire-api/client` (Zero Codegen)** |
 | **Native AI / MCP**   | None (write custom tools) | None | None | **Native MCP & Tool Exporter (`ai: true`)** |
 | **Caching Engine**    | Manual Redis setup | Manual Redis setup | Manual | **Built-in SWR Cache + Tag Invalidation** |
 
@@ -57,17 +57,17 @@
 ### 1. Installation
 
 ```bash
-bun add fire-api
+bun add @tamayrp14/fire-api
 # or
-pnpm add fire-api
+pnpm add @tamayrp14/fire-api
 # or
-npm install fire-api
+npm install @tamayrp14/fire-api
 ```
 
 ### 2. Create Your API (`src/index.ts`)
 
 ```typescript
-import { createApp, createRouter, s, createAuth, enableStudio } from 'fire-api';
+import { createApp, createRouter, s, createAuth, enableStudio } from '@tamayrp14/fire-api';
 
 const app = createApp({
   port: 3000,
@@ -247,22 +247,22 @@ app.serveSPA('/', './public/index.html');
 
 ```bash
 # 1. Scaffold a brand-new production-grade project in 1 second
-npx fire-api create my-store-api
+npx @tamayrp14/fire-api create my-store-api
 
 # 2. View a visual terminal manifest of all routes, auth & roles
-npx fire-api routes
+npx @tamayrp14/fire-api routes
 
 # 3. Generate a new resource module (route + validation schema)
-npx fire-api g resource article
+npx @tamayrp14/fire-api g resource article
 
 # 4. Measure endpoint performance under concurrency
-npx fire-api bench http://localhost:3000/posts
+npx @tamayrp14/fire-api bench http://localhost:3000/posts
 
 # 5. Generate production-hardened distroless Dockerfile (<25MB)
-npx fire-api docker
+npx @tamayrp14/fire-api docker
 
 # 6. Compile standalone single-binary application (<45MB)
-npx fire-api compile ./dist/api-server
+npx @tamayrp14/fire-api compile ./dist/api-server
 ```
 
 ---
@@ -274,8 +274,8 @@ FireAPI is tested with 100% clean passes:
 bun test
 ```
 ```text
-✓ 91 pass across 39 test suites
-✓ 412 expect() assertions executed in < 650ms
+✓ 107 pass across 41 test suites
+✓ 463 expect() assertions executed in < 700ms
 ```
 
 ---
