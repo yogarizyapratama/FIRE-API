@@ -1,5 +1,5 @@
 {
-  "name": "@yogarizyapratama/fire-api",
+  "name": "@tamayrp14/fire-api",
   "version": "1.0.0",
   "description": "Ultra-lightweight, blazing-fast, type-safe API framework with universal DB, security shield, turnkey auth, express compat, dev studio, and native AI/MCP integration",
   "main": "./dist/index.js",
