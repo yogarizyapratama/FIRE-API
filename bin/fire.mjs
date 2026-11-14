@@ -256,12 +256,12 @@ function createAppProject(options) {
       dev: "bun --watch src/index.ts",
       start: "bun src/index.ts",
       test: "bun test",
-      compile: "fire compile ./dist/server",
-      docker: "fire docker",
-      routes: "fire routes"
+      compile: "fire-api compile ./dist/server",
+      docker: "fire-api docker",
+      routes: "fire-api routes"
     },
     dependencies: {
-      "fire-api": "^1.0.0"
+      "@tamayrp14/fire-api": "^1.0.3"
     },
     devDependencies: {
       "@types/node": "^20.0.0",
@@ -323,7 +323,7 @@ http://localhost:3000/studio
 bun test
 \`\`\`
 `);
-  writeFile("src/index.ts", `import { createApp, enableStudio } from 'fire-api';
+  writeFile("src/index.ts", `import { createApp, enableStudio } from '@tamayrp14/fire-api';
 import { userRouter } from './modules/users/users.router';
 import { authRouter } from './modules/auth/auth.router';
 
@@ -350,18 +350,20 @@ enableStudio(app, { path: '/studio' });
 app.use(authRouter);
 app.use(userRouter);
 
-// Start Server
-app.listen(port, () => {
-  console.log(\`\uD83D\uDD25 \${projectName} running at http://localhost:\${port}\`);
-  console.log(\`\uD83D\uDCD6 Interactive Docs:   http://localhost:\${port}/docs\`);
-  console.log(\`\uD83D\uDDA5️ FireStudio:         http://localhost:\${port}/studio\`);
-  console.log(\`\uD83E\uDE7A Health Probes:      http://localhost:\${port}/healthz\`);
-});
+// Start Server (only when run directly, not when imported by tests)
+if (import.meta.main) {
+  app.listen(port, () => {
+    console.log(\`\uD83D\uDD25 ${projectName} running at http://localhost:\${port}\`);
+    console.log(\`\uD83D\uDCD6 Interactive Docs:   http://localhost:\${port}/docs\`);
+    console.log(\`\uD83D\uDDA5️ FireStudio:         http://localhost:\${port}/studio\`);
+    console.log(\`\uD83E\uDE7A Health Probes:      http://localhost:\${port}/healthz\`);
+  });
+}
 
 export type AppRouter = typeof app;
 export default app;
 `);
-  writeFile("src/modules/users/users.schema.ts", `import { s, type Infer } from 'fire-api';
+  writeFile("src/modules/users/users.schema.ts", `import { s, type Infer } from '@tamayrp14/fire-api';
 
 export const UserSchema = s.object({
   id: s.string().optional(),
@@ -380,7 +382,7 @@ export const CreateUserSchema = s.object({
 export type User = Infer<typeof UserSchema>;
 export type CreateUserInput = Infer<typeof CreateUserSchema>;
 `);
-  writeFile("src/modules/users/users.router.ts", `import { createRouter } from 'fire-api';
+  writeFile("src/modules/users/users.router.ts", `import { createRouter } from '@tamayrp14/fire-api';
 import { CreateUserSchema } from './users.schema';
 
 export const userRouter = createRouter('/users');
@@ -431,12 +433,12 @@ userRouter.delete('/:id', {
   },
 });
 `);
-  writeFile("src/modules/auth/auth.router.ts", `import { createAuth } from 'fire-api';
+  writeFile("src/modules/auth/auth.router.ts", `import { createAuth } from '@tamayrp14/fire-api';
 
 // Turnkey Web Crypto PBKDF2 + JWT Authentication Sub-Router
 export const authRouter = createAuth({
   jwtSecret: process.env.JWT_SECRET || 'dev_secret_key_123',
-  tokenExpiresIn: '7d',
+  tokenExpirySeconds: 7 * 24 * 60 * 60, // 7 days
 });
 `);
   writeFile("test/app.test.ts", `import { describe, expect, it } from 'bun:test';
@@ -611,7 +613,7 @@ if (cmd === "info") {
 \uD83D\uDD25 FireAPI Framework v1.0.0
 ⚡ Engine: Bun / Node.js 20+ Native Web Standards
 \uD83D\uDEE1️ Security Shield: Enabled by default
-\uD83D\uDDC4️ Database Hub: SQLite, Postgres, MySQL, Mongo, In-Memory
+\uD83D\uDDC4️ Database Hub: SQLite & In-Memory
 \uD83E\uDD16 AI/MCP: Native Model Context Protocol Support
 ⚡ JIT Fast-Path & Gzip Compression: Enabled
 \uD83D\uDD12 RBAC & Policy Gates: Enabled
