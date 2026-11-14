@@ -1,14 +1,20 @@
 {
   "name": "@tamayrp14/fire-api",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Ultra-lightweight, blazing-fast, type-safe API framework with universal DB, security shield, turnkey auth, express compat, dev studio, and native AI/MCP integration",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
   "bin": {
-    "fire-api": "./bin/fire.js",
-    "fire": "./bin/fire.js"
+    "fire-api": "./bin/fire.mjs",
+    "fire": "./bin/fire.mjs"
   },
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "docs"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/yogarizyapratama/FIRE-API.git"
@@ -45,7 +51,7 @@
   },
   "scripts": {
     "test": "bun test",
-    "build": "bun build ./src/index.ts ./src/client.ts ./src/auth/auth.ts ./src/compat/express.ts ./src/studio/studio.ts --outdir ./dist --target node && tsc --module ESNext --moduleResolution bundler --declaration --emitDeclarationOnly --outDir dist",
+    "build": "bun build ./bin/fire.js --outfile ./bin/fire.mjs --target node --format esm && chmod +x ./bin/fire.mjs && bun build ./src/index.ts ./src/client.ts ./src/auth/auth.ts ./src/compat/express.ts ./src/studio/studio.ts --outdir ./dist --target node && tsc --module ESNext --moduleResolution bundler --declaration --emitDeclarationOnly --outDir dist",
     "prepublishOnly": "bun run build"
   },
   "keywords": [
