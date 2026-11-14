@@ -22,7 +22,7 @@ export class FireQueueManager implements FireQueue {
   public async dispatch<T = any>(
     name: string,
     data: T,
-    options: { maxAttempts?: number; delayMs?: number } = {}
+    options: { maxAttempts?: number; delayMs?: number; retryDelayMs?: number } = {}
   ): Promise<FireQueueJob<T>> {
     const id = `job_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     const job: FireQueueJob<T> = {

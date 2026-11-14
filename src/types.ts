@@ -1,6 +1,6 @@
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS' | 'HEAD';
 
-export interface TableModel<T = any> extends QueryBuilder {
+export interface TableModel<T = any> extends Omit<QueryBuilder, 'find' | 'findOne' | 'findById' | 'insert' | 'update' | 'delete' | 'include'> {
   find(filter?: Record<string, any>): Promise<T[]>;
   findOne(filter?: Record<string, any>): Promise<T | null>;
   findById(id: string | number): Promise<T | null>;
@@ -15,7 +15,7 @@ export interface FireDatabase {
   raw<T = any>(sql: string, params?: any[]): Promise<T>;
   transaction<T>(fn: (trx: FireDatabase) => Promise<T>): Promise<T>;
   tx<T>(fn: (trx: FireDatabase) => Promise<T>): Promise<T>;
-  seed(tableName: string, schema: any, count?: number): Promise<any[]>;
+  seed?(tableName: string, schema: any, count?: number): Promise<any[]>;
   [table: string]: any;
 }
 
@@ -51,7 +51,7 @@ export interface FireQueueJob<T = any> {
 }
 
 export interface FireQueue {
-  dispatch<T = any>(name: string, data: T, options?: { maxAttempts?: number; delayMs?: number }): Promise<FireQueueJob<T>>;
+  dispatch<T = any>(name: string, data: T, options?: { maxAttempts?: number; delayMs?: number; retryDelayMs?: number }): Promise<FireQueueJob<T>>;
   handle<T = any>(name: string, worker: (data: T, job: FireQueueJob<T>) => Promise<void> | void): void;
 }
 

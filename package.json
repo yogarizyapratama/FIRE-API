@@ -1,41 +1,52 @@
 {
-  "name": "fire-api",
+  "name": "@yogarizyapratama/fire-api",
   "version": "1.0.0",
   "description": "Ultra-lightweight, blazing-fast, type-safe API framework with universal DB, security shield, turnkey auth, express compat, dev studio, and native AI/MCP integration",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "type": "module",
   "bin": {
     "fire-api": "./bin/fire.js",
     "fire": "./bin/fire.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yogarizyapratama/FIRE-API.git"
+  },
+  "homepage": "https://github.com/yogarizyapratama/FIRE-API#readme",
+  "bugs": {
+    "url": "https://github.com/yogarizyapratama/FIRE-API/issues"
+  },
+  "author": "Yoga Rizya Pratama",
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./client": {
-      "import": "./src/client.ts",
-      "types": "./src/client.ts"
+      "import": "./dist/client.js",
+      "types": "./dist/client.d.ts"
     },
     "./auth": {
-      "import": "./src/auth/auth.ts",
-      "types": "./src/auth/auth.ts"
+      "import": "./dist/auth/auth.js",
+      "types": "./dist/auth/auth.d.ts"
     },
     "./compat": {
-      "import": "./src/compat/express.ts",
-      "types": "./src/compat/express.ts"
+      "import": "./dist/compat/express.js",
+      "types": "./dist/compat/express.d.ts"
     },
     "./studio": {
-      "import": "./src/studio/studio.ts",
-      "types": "./src/studio/studio.ts"
+      "import": "./dist/studio/studio.js",
+      "types": "./dist/studio/studio.d.ts"
     }
   },
   "scripts": {
     "test": "bun test",
-    "typecheck": "tsc --noEmit",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "bun build ./src/index.ts ./src/client.ts ./src/auth/auth.ts ./src/compat/express.ts ./src/studio/studio.ts --outdir ./dist --target node && tsc --module ESNext --moduleResolution bundler --declaration --emitDeclarationOnly --outDir dist",
+    "prepublishOnly": "bun run build"
   },
   "keywords": [
     "framework",
@@ -51,7 +62,6 @@
     "studio",
     "rest"
   ],
-  "author": "Antigravity Team",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.13.0",

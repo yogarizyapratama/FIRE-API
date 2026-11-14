@@ -1,4 +1,4 @@
-import { createRouter } from 'fire-api';
+import { createRouter } from '../../index';
 import { CreateProductSchema, ProductIdSchema } from './product.schema';
 
 export const productRouter = createRouter('/products');

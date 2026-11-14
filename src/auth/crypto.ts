@@ -1,5 +1,5 @@
-function bufferToHex(buffer: ArrayBuffer): string {
-  return Array.from(new Uint8Array(buffer))
+function bufferToHex(buffer: ArrayBuffer | Uint8Array): string {
+  return Array.from(new Uint8Array(buffer as any))
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }
@@ -28,7 +28,7 @@ export async function hashPassword(password: string): Promise<string> {
   const derived = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      salt,
+      salt: salt as any,
       iterations: 100000,
       hash: 'SHA-256',
     },
@@ -58,7 +58,7 @@ export async function verifyPassword(password: string, storedHash: string): Prom
   const derived = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      salt,
+      salt: salt as any,
       iterations: 100000,
       hash: 'SHA-256',
     },

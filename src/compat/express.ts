@@ -37,7 +37,7 @@ export function fromExpress(expressMiddleware: ExpressMiddleware): Middleware {
         return true;
       },
       has(_target, prop: string) {
-        return prop in customProps || prop in target;
+        return prop in customProps || prop in _target;
       },
     });
 

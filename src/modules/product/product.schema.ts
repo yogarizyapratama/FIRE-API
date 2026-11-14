@@ -1,4 +1,4 @@
-import { s } from 'fire-api';
+import { s } from '../../index';
 
 export const CreateProductSchema = s.object({
   name: s.string().min(2).description('Product title or name'),

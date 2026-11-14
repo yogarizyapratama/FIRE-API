@@ -34,6 +34,9 @@ const dummyDb: FireDatabase = {
   async tx() {
     throw new Error('Database not initialized');
   },
+  async seed() {
+    throw new Error('Database not initialized');
+  },
 };
 
 const dummyCache: FireCacheManager = {

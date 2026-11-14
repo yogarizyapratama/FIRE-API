@@ -13,7 +13,7 @@ export async function computeHMAC(
   );
 
   const data = typeof payload === 'string' ? enc.encode(payload) : payload;
-  const signatureBuf = await crypto.subtle.sign('HMAC', key, data);
+  const signatureBuf = await crypto.subtle.sign('HMAC', key, data as any);
 
   return Array.from(new Uint8Array(signatureBuf))
     .map((b) => b.toString(16).padStart(2, '0'))
