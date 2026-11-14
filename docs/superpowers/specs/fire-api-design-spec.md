@@ -15,7 +15,7 @@ FireAPI provides:
 2. **Standard Web Primitives**: Built natively on Web Standard `Request`, `Response`, and `Headers`. Seamless execution on **Bun**, **Node.js 20+**, and **Deno**.
 3. **Batteries-Included Out of the Box**:
    - **FireShield**: Automated security headers, CORS, rate limiting, and prototype pollution defense.
-   - **FireDB**: Universal multi-database connection hub (PostgreSQL, MySQL, SQLite, MongoDB, Redis, In-Memory) with auto-mocking.
+   - **FireDB**: Multi-database connection hub (SQLite, In-Memory) with auto-mocking.
    - **FireSchema**: Zero-duplication validation schema driving runtime validation, TypeScript type inference, and OpenAPI 3.1 generation.
    - **FireClient (Killer Feature #1)**: Zero-codegen End-to-End Type-Safe RPC Client for frontend applications (React, Next.js, Vue, Svelte, Mobile).
    - **FireAI & MCP (Killer Feature #2)**: Native Model Context Protocol (MCP) server generation and OpenAI function-calling tool exports directly from registered routes.
@@ -32,7 +32,7 @@ FireAPI provides:
 | **Memory Footprint** | ~75MB - 120MB baseline | ~30MB | ~12MB | **< 15MB baseline** |
 | **Database Wiring** | Heavy (TypeORM/Prisma + Module wrapper) | Manual DIY | Manual DIY | **Universal DB Hub in `ctx.db` + Auto-Mock** |
 | **Security Shield** | 4-5 npm packages manual config | Vulnerable by default | Plugins required | **Zero-Config Enabled by Default** |
-| **Frontend RPC Client**| Manual fetch or code-gen SDK | Manual fetch | Elysia Eden (Elysia only) | **Native `fire-api/client` (Zero Codegen)** |
+| **Frontend RPC Client**| Manual fetch or code-gen SDK | Manual fetch | Elysia Eden (Elysia only) | **Native `@tamayrp14/fire-api/client` (Zero Codegen)** |
 | **AI / MCP Native**  | None (write custom tools) | None | None | **Native MCP & Tool Exporter (`ai: true`)** |
 | **Caching Engine**   | Manual Redis setup | Manual Redis setup | Manual | **Built-in SWR Cache + Tag Invalidation** |
 
@@ -48,7 +48,7 @@ FireAPI provides:
 │  2. FireContext (Request, Response, JSON, DB, Auth)    │
 │  3. FireShield (Headers, CORS, RateLimit, CSRF, XSS)   │
 │  4. FireSchema (Validator, Type Infer, OpenAPI Gen)    │
-│  5. FireDB (SQLite, Postgres, MySQL, Mongo, Memory)    │
+│  5. FireDB (SQLite, Memory)                            │
 │  6. FireClient (Zero-Codegen End-to-End Type-Safe RPC) │
 │  7. FireAI (Native Model Context Protocol - MCP Tool)  │
 │  8. FireCache (SWR Caching & Tag-Based Invalidation)   │
@@ -60,7 +60,7 @@ FireAPI provides:
 ### 3.1 FireClient: Zero-Codegen E2E Type-Safe Client
 Frontend developers import the client and application type for instant autocomplete:
 ```typescript
-import { createClient } from 'fire-api/client';
+import { createClient } from '@tamayrp14/fire-api/client';
 import type { App } from './backend';
 
 const api = createClient<App>('https://api.example.com');
@@ -79,10 +79,10 @@ app.enableMCP({ name: 'CRM-Tools', version: '1.0.0' });
 ## 4. Public API Design
 
 ```typescript
-import { createApp, createRouter, s } from 'fire-api';
+import { createApp, createRouter, s } from '@tamayrp14/fire-api';
 
 const app = createApp({
-  database: { driver: 'memory' }, // or 'sqlite' | 'postgres' | 'mysql'
+  database: { driver: 'memory' }, // or 'sqlite'
   security: { rateLimit: { max: 100, window: '1m' } },
   cache: { defaultTTL: '5m' },
 });

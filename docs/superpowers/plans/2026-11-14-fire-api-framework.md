@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build and package `fire-api`, the next-generation JavaScript/TypeScript API framework featuring universal DB connectivity, zero-config security shield, automatic schema validation, OpenAPI docs, zero-codegen E2E type-safe RPC client, and native Model Context Protocol (MCP) AI tool integration.
+**Goal:** Build and package `@tamayrp14/fire-api`, the next-generation JavaScript/TypeScript API framework featuring multi-engine DB connectivity (SQLite + In-Memory), zero-config security shield, automatic schema validation, OpenAPI docs, zero-codegen E2E type-safe RPC client, and native Model Context Protocol (MCP) AI tool integration.
 
 **Architecture:** Pure functional-modular core built on Web Standard `Request`/`Response` primitives. Integrates a high-speed radix tree router, FireShield security layer, FireDB universal database hub with auto-mocking, FireSchema validation & OpenAPI engine, FireClient proxy-based RPC, and FireAI MCP tool exporter.
 
@@ -25,6 +25,7 @@
 ## Target File Structure
 
 ```text
+# Historical monorepo layout (now src/ and test/ live at repo root)
 packages/fire-api/
 ├── package.json
 ├── tsconfig.json
