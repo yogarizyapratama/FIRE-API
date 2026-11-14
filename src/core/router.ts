@@ -36,6 +36,18 @@ export function normalizePath(path: string): string {
   return clean;
 }
 
+function hasPathPrefix(path: string, prefix: string): boolean {
+  return path === prefix || path.startsWith(prefix + '/');
+}
+
+function safeDecode(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 export class Router {
   private root: RadixNode = createNode();
   public middlewares: Middleware[] = [];
@@ -59,7 +71,7 @@ export class Router {
 
     if (arg1 instanceof Router) {
       for (const route of arg1.routesList) {
-        const fullPath = this.prefix && !route.path.startsWith(this.prefix)
+        const fullPath = this.prefix && !hasPathPrefix(route.path, this.prefix)
           ? normalizePath(`${this.prefix}/${route.path}`)
           : route.path;
         const combinedMiddlewares = [...arg1.middlewares, ...(route.options.middlewares || [])];
@@ -74,7 +86,7 @@ export class Router {
     if (typeof arg1 === 'string' && arg2 instanceof Router) {
       const subPrefix = normalizePath(arg1);
       for (const route of arg2.routesList) {
-        const fullPath = route.path.startsWith(subPrefix)
+        const fullPath = hasPathPrefix(route.path, subPrefix)
           ? route.path
           : normalizePath(`${subPrefix}/${route.path}`);
         const combinedMiddlewares = [...arg2.middlewares, ...(route.options.middlewares || [])];
@@ -91,7 +103,7 @@ export class Router {
 
   public addRoute(method: HttpMethod, path: string, options: RouteOptions): this {
     let cleanPath = normalizePath(path);
-    if (this.prefix && !cleanPath.startsWith(this.prefix)) {
+    if (this.prefix && !hasPathPrefix(cleanPath, this.prefix)) {
       cleanPath = normalizePath(`${this.prefix}/${cleanPath}`);
     }
     return this.addRawRoute(method, cleanPath, options);
@@ -237,7 +249,7 @@ export class Router {
       const match = this.searchNode(node.paramChild, parts, index + 1, method, params);
       if (match) {
         if (node.paramChild.paramName) {
-          params[node.paramChild.paramName] = decodeURIComponent(part);
+          params[node.paramChild.paramName] = safeDecode(part);
         }
         return match;
       }
@@ -245,7 +257,7 @@ export class Router {
 
     // 3. Wildcard match
     if (node.wildcardChild && node.wildcardChild.handlers.has(method)) {
-      params['*'] = parts.slice(index).map(decodeURIComponent).join('/');
+      params['*'] = parts.slice(index).map(safeDecode).join('/');
       return node.wildcardChild.handlers.get(method)!;
     }
 

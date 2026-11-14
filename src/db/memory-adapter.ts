@@ -109,17 +109,17 @@ export class MemoryQueryBuilder implements QueryBuilder {
     const table = this.getTableData();
     if (Array.isArray(data)) {
       const insertedList = data.map((item, idx) => ({
+        ...item,
         id: item.id || `mem_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 7)}`,
         createdAt: new Date().toISOString(),
-        ...item,
       }));
       table.push(...insertedList);
       return insertedList as any;
     } else {
       const inserted = {
+        ...data,
         id: data.id || `mem_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         createdAt: new Date().toISOString(),
-        ...data,
       };
       table.push(inserted);
       return inserted as any;

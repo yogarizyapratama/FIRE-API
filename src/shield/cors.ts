@@ -12,7 +12,7 @@ export function handleCORS(request: Request, options: CorsOptions = {}): Respons
   if (!origin) return null; // Not a CORS request
 
   const isPreflight = request.method === 'OPTIONS';
-  const allowedOrigin = resolveAllowedOrigin(origin, options.origin);
+  const allowedOrigin = resolveOriginForResponse(origin, options);
 
   if (!allowedOrigin) {
     if (isPreflight) {
@@ -55,7 +55,7 @@ export function appendCorsHeaders(response: Response, request: Request, options:
   const origin = request.headers.get('origin');
   if (!origin) return response;
 
-  const allowedOrigin = resolveAllowedOrigin(origin, options.origin);
+  const allowedOrigin = resolveOriginForResponse(origin, options);
   if (!allowedOrigin) return response;
 
   const headers = new Headers(response.headers);
@@ -91,4 +91,14 @@ function resolveAllowedOrigin(
     return configuredOrigin(reqOrigin) ? reqOrigin : null;
   }
   return null;
+}
+
+// Browsers reject `Access-Control-Allow-Origin: *` when credentials are
+// included, so echo the request origin instead.
+function resolveOriginForResponse(reqOrigin: string, options: CorsOptions): string | null {
+  const allowed = resolveAllowedOrigin(reqOrigin, options.origin);
+  if (allowed === '*' && options.credentials) {
+    return reqOrigin;
+  }
+  return allowed;
 }

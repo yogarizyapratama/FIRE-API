@@ -140,11 +140,20 @@ export class FireApp {
 
   public serveStatic(routePrefix: string, localDirectory: string): this {
     const normalizedPrefix = routePrefix.endsWith('/') ? routePrefix.slice(0, -1) : routePrefix;
+    const base = path.resolve(localDirectory);
     this.router.get(`${normalizedPrefix}/*`, {
       handler: (ctx) => {
         const url = new URL(ctx.req.url);
-        const subPath = url.pathname.slice(normalizedPrefix.length).replace(/^\/+/, '');
-        const filePath = path.resolve(localDirectory, subPath);
+        let subPath = url.pathname.slice(normalizedPrefix.length).replace(/^\/+/, '');
+        try {
+          subPath = decodeURIComponent(subPath);
+        } catch {
+          // keep raw path on malformed encoding
+        }
+        const filePath = path.resolve(base, subPath);
+        if (filePath !== base && !filePath.startsWith(base + path.sep)) {
+          return ctx.notFound(`File ${subPath} not found`);
+        }
         const res = createStaticFileResponse(filePath);
         if (!res) {
           return ctx.notFound(`File ${subPath} not found`);

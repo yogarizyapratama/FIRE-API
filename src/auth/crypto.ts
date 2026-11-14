@@ -12,6 +12,18 @@ function hexToBuffer(hex: string): Uint8Array {
   return bytes;
 }
 
+function constantTimeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
+// OWASP 2023 recommendation for PBKDF2-HMAC-SHA256
+const PBKDF2_ITERATIONS = 600000;
+
 export async function hashPassword(password: string): Promise<string> {
   const salt = new Uint8Array(16);
   crypto.getRandomValues(salt);
@@ -29,7 +41,7 @@ export async function hashPassword(password: string): Promise<string> {
     {
       name: 'PBKDF2',
       salt: salt as any,
-      iterations: 100000,
+      iterations: PBKDF2_ITERATIONS,
       hash: 'SHA-256',
     },
     keyMaterial,
@@ -59,12 +71,12 @@ export async function verifyPassword(password: string, storedHash: string): Prom
     {
       name: 'PBKDF2',
       salt: salt as any,
-      iterations: 100000,
+      iterations: PBKDF2_ITERATIONS,
       hash: 'SHA-256',
     },
     keyMaterial,
     256
   );
 
-  return bufferToHex(derived) === originalHashHex;
+  return constantTimeEqualHex(bufferToHex(derived), originalHashHex);
 }
