@@ -33,7 +33,18 @@ describe('FireAPI CLI Scaffolding & Developer Accelerator (create-app & routes)'
     const pkg = JSON.parse(fs.readFileSync(path.join(tempProjectDir, 'package.json'), 'utf-8'));
     expect(pkg.name).toBe('test-saas-api');
     expect(pkg.scripts.dev).toContain('bun');
-    expect(pkg.scripts.compile).toContain('fire compile');
+    expect(pkg.scripts.compile).toContain('fire-api compile');
+    expect(pkg.dependencies['@tamayrp14/fire-api']).toBe('^1.0.3');
+
+    // Generated code must import the real (scoped) package and interpolate the project name
+    const indexSrc = fs.readFileSync(path.join(tempProjectDir, 'src/index.ts'), 'utf-8');
+    expect(indexSrc).toContain("@tamayrp14/fire-api");
+    expect(indexSrc).toContain('test-saas-api');
+    expect(indexSrc).not.toContain('${projectName}');
+
+    const authSrc = fs.readFileSync(path.join(tempProjectDir, 'src/modules/auth/auth.router.ts'), 'utf-8');
+    expect(authSrc).toContain('tokenExpirySeconds');
+    expect(authSrc).not.toContain('tokenExpiresIn');
   });
 
   it('renders a visual terminal route table via formatRoutesTable()', () => {
